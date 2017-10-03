@@ -1,21 +1,13 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Elimez</title>
-        <link rel="stylesheet" href="../style.css">
-    </head>
+{% extends "base.html" %}
 
-    <body>
+{% block content %}
 
         <h1 class="project-name">Elimez</h1>
         
         <h2 class="project-tagline">Welcome to Elimez, your ultimate solution to shareable to-do list</h2>
 
         <div class="wrapper">
-            <a href="login.html" class="btn">Login</a>
-            <a href="register.html" class="btn">Register</a>
+            <a href="/login" class="btn">Login</a>
+            <a href="/register" class="btn">Register</a>
         </div>
-    </body>
-
-</html>
+{% endblock %}
