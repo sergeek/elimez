@@ -16,10 +16,32 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(120))
+    lists = db.relationship('List', backref='owner')
 
     def __init__(self, username, password):
         self.username = username
         self.password = password
+
+class List(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(120))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    items = db.relationship('Task', backref='owner')
+
+    def __init__(self, title, owner):
+        self.title = title
+        self.owner = owner
+
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    item = db.Column(db.String(120))
+    completed = db.Column(db.Boolean)
+    list_id = db.Column(db.Integer, db.ForeignKey('list.id'))
+
+    def __init__(self, item, owner):
+        self.item = item
+        self.completed = False
+        self.owner = owner
 
 
 @app.route('/register', methods=['POST', 'GET'])
