@@ -56,10 +56,27 @@ def register():
     return render_template('register.html', page_title="Register")
 
 
-
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        password_hash = hashlib.sha256(str.encode(password)).hexdigest()
+        user = User.query.filter_by(username=username).first()
+        if user and password_hash:
+            session['username'] = username
+            return redirect("/")
+        else:
+            flash('User password incorrect, or user does not exist', 'error')
+
+            return render_template("login.html", page_title = "Login")
+
     return render_template('login.html', page_title="Login")
+
+@app.route("/logout")
+def logout():
+    del session["username"]
+    return redirect("/")
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
