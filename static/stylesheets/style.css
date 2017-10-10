@@ -72,12 +72,12 @@ body {
     margin-left: 25%;
 }
 
-ul {
+.header {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #159957;
+    background-color: linear-gradient(85deg, #155799, #159957);
     position: fixed;
     top: 0;
     width: 100%;
