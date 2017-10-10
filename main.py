@@ -85,7 +85,7 @@ def login():
         password = request.form['password']
         password_hash = hashlib.sha256(str.encode(password)).hexdigest()
         user = User.query.filter_by(username=username).first()
-        if user and password_hash:
+        if user and (password_hash == user.password):
             session['username'] = username
             return redirect("/")
         else:
