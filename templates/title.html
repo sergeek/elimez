@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="login-title">Create a new to-do list</h2>
+
+
+    <form method='post', action='title'>
+
+        
+        <h2 class="project-tagline">Please Enter List Title: </h2>
+        <input name="title" type="text" class="form-input"><br>
+        
+        
+        <div class="wrapper">
+            <input value="Next" type="submit" class="btn"/>
+        </div>
+       
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    <ul>
+    {% for category,message in messages %}
+        <li class="{{category}}">{{message}}</li>
+    {% endfor %}
+    </ul>
+    {% endwith %}
+
+
+{% endblock %}

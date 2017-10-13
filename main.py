@@ -1,8 +1,9 @@
-from flask import Flask, request, redirect, render_template, url_for, flash, session
-
-from flask_sqlalchemy import SQLAlchemy 
-import hashlib
 import os
+import hashlib
+from flask import Flask, request, redirect, render_template, url_for, flash, session
+from flask_sqlalchemy import SQLAlchemy 
+import cgi
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -99,6 +100,25 @@ def login():
 def logout():
     del session["username"]
     return redirect("/")
+
+
+@app.route("/title", methods=['POST', 'GET'])
+def title():
+    if request.method == 'POST':
+        title = request.form['title']
+        if title == '':
+            flash("Title can't be empty", 'error')
+            return redirect('/title')
+
+        owner = User.query.filter_by(username=session['username']).first()
+        new_list = List(title, owner)
+        db.session.add(new_list)
+        db.session.commit()
+
+        return render_template('index.html', page_title="oh yeaaa")
+    
+    return render_template('title.html', page_title="Create List")
+
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
