@@ -88,7 +88,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and (password_hash == user.password):
             session['username'] = username
-            return redirect("/")
+            return redirect("/lists")
         else:
             flash('User password incorrect, or user does not exist', 'error')
 
@@ -128,10 +128,13 @@ def add_task():
     new_task = Task(task_item, task_owner)
     db.session.add(new_task)
     db.session.commit()
-
     tasks = Task.query.filter_by(list_id=task_owner).all()
     
     return render_template('todos.html', page_title=title, tasks=tasks, id=task_owner)
+
+@app.route('/lists')
+def my_lists():
+    return render_template('lists.html', page_title='My Lists')
 
 
 @app.route('/', methods=['POST', 'GET'])
