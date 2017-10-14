@@ -83,11 +83,11 @@ body {
     width: 100%;
 }
 
-li {
+.nav-bar {
     float: left;
 }
 
-li a {
+.nav-bar a {
     display: block;
     color: white;
     text-align: center;
@@ -95,7 +95,7 @@ li a {
     text-decoration: none;
 }
 
-li a:hover:not(.active) {
+.nav-bar a:hover:not(.active) {
     background-color: gray;
 }
 

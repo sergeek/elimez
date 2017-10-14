@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="login-title">{{page_title}}</h1>
+<form method='post' action="/add-task">
+    <label for='task'>New Task:</label>
+    <input type="text" name='task' />
+    <input type="hidden" name='list-id' value="{{id}}">
+    <input type="submit" value='Add Task' />
+</form>
+
+<hr />
+
+    {% if tasks|length == 0 %}
+    <p>No tasks yet</p>
+    {% else %}
+
+    <ul>
+        {% for task in tasks %}
+        <li>
+            <form method="POST" action="/complete-task" style="display:inline-block;">
+                <input type="hidden" name="task-id" value="{{task.id}}" />
+                <input type="submit" value="" />
+            </form>
+            {{task.item}}
+        </li>
+        {% endfor %}
+    </ul>
+
+{% endif %}
+
+
+{% endblock %}

@@ -42,7 +42,7 @@ class Task(db.Model):
     def __init__(self, item, owner):
         self.item = item
         self.completed = False
-        self.owner = owner
+        self.list_id = owner
 
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -115,9 +115,23 @@ def title():
         db.session.add(new_list)
         db.session.commit()
 
-        return render_template('index.html', page_title="oh yeaaa")
-    
+        session['title'] = title
+        return render_template('todos.html', page_title=title, id=new_list.id)
+
     return render_template('title.html', page_title="Create List")
+
+@app.route("/add-task", methods=['POST'])
+def add_task():
+    title = session['title']
+    task_item = request.form['task']
+    task_owner = request.form['list-id']
+    new_task = Task(task_item, task_owner)
+    db.session.add(new_task)
+    db.session.commit()
+
+    tasks = Task.query.filter_by(list_id=task_owner).all()
+    
+    return render_template('todos.html', page_title=title, tasks=tasks, id=task_owner)
 
 
 @app.route('/', methods=['POST', 'GET'])
