@@ -5,6 +5,14 @@
 
         <h1 class="login-title">My To-Do Lists</h1>
 
+        <ul>
+        {% for list in lists %}
+
+        <li><a href="/display?list_id={{list.id}}">{{list.title}}</a></li>
+
+        {% endfor %}
+        </ul>
+
         <div class="wrapper">
                 <a href="/title" class="btn">Create New List</a>
         </div>

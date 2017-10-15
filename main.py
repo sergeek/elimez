@@ -13,6 +13,7 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = 'MakeAWish'
 
+#Create User, List, and Task DBs
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True)
@@ -44,7 +45,7 @@ class Task(db.Model):
         self.completed = False
         self.list_id = owner
 
-
+#Handle user registration
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if request.method == 'POST':
@@ -71,14 +72,14 @@ def register():
 
             session['username'] = username
 
-            return redirect('/')
+            return redirect('/lists')
         else: 
             flash('User already exist', 'error')
             return render_template('register.html')
     
     return render_template('register.html', page_title="Register")
 
-
+#Verify user login data, and store username in session
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
@@ -96,12 +97,13 @@ def login():
 
     return render_template('login.html', page_title="Login")
 
+#Delete username session on logout
 @app.route("/logout")
 def logout():
     del session["username"]
     return redirect("/")
 
-
+#Create new list handler: first displays a title form page, and then to-do list on next btn
 @app.route("/title", methods=['POST', 'GET'])
 def title():
     if request.method == 'POST':
@@ -116,10 +118,11 @@ def title():
         db.session.commit()
 
         session['title'] = title
-        return render_template('todos.html', page_title=title, id=new_list.id)
+        return render_template('todos.html', page_title=title, list_id=new_list.id)
 
     return render_template('title.html', page_title="Create List")
 
+#Adding tasks on a newly created list only
 @app.route("/add-task", methods=['POST'])
 def add_task():
     title = session['title']
@@ -130,11 +133,23 @@ def add_task():
     db.session.commit()
     tasks = Task.query.filter_by(list_id=task_owner).all()
     
-    return render_template('todos.html', page_title=title, tasks=tasks, id=task_owner)
+    return render_template('todos.html', page_title=title, tasks=tasks, list_id=task_owner)
 
+#Displaying all the list for the given user
 @app.route('/lists')
 def my_lists():
-    return render_template('lists.html', page_title='My Lists')
+    logged_user = User.query.filter_by(username=session['username']).first()
+    lists = List.query.filter_by(owner_id=logged_user.id).all()
+
+    return render_template('lists.html', page_title='My Lists', lists=lists)
+
+#Displaying todos page for the list title clicked
+@app.route('/display')
+def show_list():
+    list_id=request.args.get('list_id')
+    tasks = Task.query.filter_by(list_id=list_id).all()
+
+    return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id)
 
 
 @app.route('/', methods=['POST', 'GET'])
