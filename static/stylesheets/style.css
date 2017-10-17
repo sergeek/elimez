@@ -48,6 +48,22 @@ body {
     text-align: center;
 }
 
+.list-title a {
+    margin-left: %;
+    margin: 50px;
+    text-align: left;
+    color: white;
+    padding:2px 8px;
+}
+
+.list-title a:hover:not(.active) {
+    background-color: gray;
+}
+
+.active {
+    background-color: gray;
+}
+
 .form-input {
     margin-left: 25%;
     display: block;

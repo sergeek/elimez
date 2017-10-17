@@ -45,6 +45,12 @@ class Task(db.Model):
         self.completed = False
         self.list_id = owner
 
+@app.before_request
+def require_login():
+    allowed_routes = ['register', 'login', 'index', 'static']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/')
+
 #Handle user registration
 @app.route('/register', methods=['POST', 'GET'])
 def register():
