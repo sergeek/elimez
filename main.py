@@ -49,7 +49,7 @@ class Task(db.Model):
 def require_login():
     allowed_routes = ['register', 'login', 'index', 'static']
     if request.endpoint not in allowed_routes and 'username' not in session:
-        return redirect('/')
+        return redirect('/login')
 
 #Handle user registration
 @app.route('/register', methods=['POST', 'GET'])
