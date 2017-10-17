@@ -131,9 +131,10 @@ def title():
 #Adding tasks on a newly created list only
 @app.route("/add-task", methods=['POST'])
 def add_task():
-    title = session['title']
     task_item = request.form['task']
     task_owner = request.form['list-id']
+    list_obj = List.query.filter_by(id=task_owner).first()
+    title = list_obj.title
     new_task = Task(task_item, task_owner)
     db.session.add(new_task)
     db.session.commit()
@@ -154,6 +155,8 @@ def my_lists():
 def show_list():
     list_id=request.args.get('list_id')
     tasks = Task.query.filter_by(list_id=list_id).all()
+    list_obj = List.query.filter_by(id=list_id).first()
+    title = list_obj.title
 
     return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id)
 
