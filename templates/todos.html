@@ -21,7 +21,7 @@
         <li>
             <form method="POST" action="/complete-task" style="display:inline-block;">
                 <input type="hidden" name="task-id" value="{{task.id}}" />
-                <input type="submit" value="" />
+                <input type="submit" value="{{task.completed}}" />
             </form>
             {{task.item}}
         </li>

@@ -160,6 +160,25 @@ def show_list():
 
     return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id)
 
+#Toggle the switch to completed/not-completed
+@app.route('/complete-task', methods=['POST'])
+def complete():
+
+    task_id = int(request.form['task-id'])
+    task = Task.query.get(task_id)
+
+    if task.completed == False:
+        task.completed = True
+    else: task.completed = False
+    db.session.add(task)
+    db.session.commit()
+
+    list_id = task.list_id
+    tasks = Task.query.filter_by(list_id=list_id).all()
+    list_obj = List.query.filter_by(id=list_id).first()
+    title = list_obj.title
+
+    return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id)
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
