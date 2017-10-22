@@ -153,12 +153,17 @@ def my_lists():
 #Displaying todos page for the list title clicked
 @app.route('/display')
 def show_list():
+    logged_user = User.query.filter_by(username=session['username']).first()
     list_id=request.args.get('list_id')
-    tasks = Task.query.filter_by(list_id=list_id).all()
     list_obj = List.query.filter_by(id=list_id).first()
-    title = list_obj.title
 
-    return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id)
+    #make sure user id matches owner id
+    if logged_user.id == list_obj.owner_id:
+        tasks = Task.query.filter_by(list_id=list_id).all()
+        title = list_obj.title
+        return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id)
+    else: 
+        return "Something went wrong"
 
 #Toggle the switch to completed/not-completed
 @app.route('/complete-task', methods=['POST'])
