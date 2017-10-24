@@ -13,12 +13,20 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = 'MakeAWish'
 
+
+#Create many to many relationship between List and a User
+users_lists = db.Table('users_lists',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('list_id', db.Integer, db.ForeignKey('list.id'))
+    )
+
 #Create User, List, and Task DBs
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(120))
-    lists = db.relationship('List', backref='owner')
+    lists = db.relationship('List', secondary=users_lists, 
+    backref=db.backref('admins', lazy = 'dynamic'))
 
     def __init__(self, username, password):
         self.username = username
@@ -27,12 +35,10 @@ class User(db.Model):
 class List(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     items = db.relationship('Task', backref='owner')
 
-    def __init__(self, title, owner):
+    def __init__(self, title):
         self.title = title
-        self.owner = owner
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -119,8 +125,11 @@ def title():
             return redirect('/title')
 
         owner = User.query.filter_by(username=session['username']).first()
-        new_list = List(title, owner)
+        new_list = List(title)
         db.session.add(new_list)
+        db.session.commit()
+
+        new_list.admins.append(owner)
         db.session.commit()
 
         session['title'] = title
@@ -146,7 +155,7 @@ def add_task():
 @app.route('/lists')
 def my_lists():
     logged_user = User.query.filter_by(username=session['username']).first()
-    lists = List.query.filter_by(owner_id=logged_user.id).all()
+    lists = logged_user.lists
 
     return render_template('lists.html', page_title='My Lists', lists=lists)
 
@@ -157,8 +166,14 @@ def show_list():
     list_id=request.args.get('list_id')
     list_obj = List.query.filter_by(id=list_id).first()
 
-    #make sure user id matches owner id
-    if logged_user.id == list_obj.owner_id:
+    #Security check part a: find all lists that belong to user
+    my_lists = logged_user.lists
+    my_list_ids = []
+    for lst in my_lists:
+        my_list_ids.append(lst.id)
+
+    #Security check part b: make sure user has permission to the list
+    if list_obj.id in my_list_ids:
         tasks = Task.query.filter_by(list_id=list_id).all()
         title = list_obj.title
         return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id)
