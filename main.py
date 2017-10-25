@@ -118,6 +118,7 @@ def logout():
 #Create new list handler: first displays a title form page, and then to-do list on next btn
 @app.route("/title", methods=['POST', 'GET'])
 def title():
+    username=session['username']
     if request.method == 'POST':
         title = request.form['title']
         if title == '':
@@ -133,9 +134,10 @@ def title():
         db.session.commit()
 
         session['title'] = title
-        return render_template('todos.html', page_title=title, list_id=new_list.id)
+        admins = new_list.admins
+        return render_template('todos.html', page_title=title, list_id=new_list.id, username=username, admins=admins)
 
-    return render_template('title.html', page_title="Create List")
+    return render_template('title.html', page_title="Create List", username=username)
 
 #Adding tasks on a newly created list only
 @app.route("/add-task", methods=['POST'])
@@ -148,16 +150,45 @@ def add_task():
     db.session.add(new_task)
     db.session.commit()
     tasks = Task.query.filter_by(list_id=task_owner).all()
+    username=session['username']
+    admins = list_obj.admins
     
-    return render_template('todos.html', page_title=title, tasks=tasks, list_id=task_owner)
+    return render_template('todos.html', page_title=title, tasks=tasks, list_id=task_owner, username=username, admins=admins)
+
+#Add user the the list handler
+@app.route("/add-user", methods=['POST'])
+def add_user():
+    task_owner = request.form['list-id']
+    list_obj = List.query.filter_by(id=task_owner).first()
+    title = list_obj.title
+    tasks = Task.query.filter_by(list_id=task_owner).all()
+    username=session['username']
+
+    get_username = request.form['user']
+    user = User.query.filter_by(username=get_username).first()
+
+    if user and user not in list_obj.admins:
+        list_obj.admins.append(user)
+        db.session.commit()
+        admins = list_obj.admins
+        return render_template('todos.html', page_title=title, tasks=tasks, list_id=task_owner, username=username, admins=admins)
+    else:
+        if user in list_obj.admins:
+            flash('User already added', 'error')
+        else:
+            flash('User does not exist', 'error')
+        admins = list_obj.admins
+        return render_template('todos.html', page_title=title, tasks=tasks, list_id=task_owner, username=username, admins=admins)
+
 
 #Displaying all the list for the given user
 @app.route('/lists')
 def my_lists():
     logged_user = User.query.filter_by(username=session['username']).first()
     lists = logged_user.lists
+    username = logged_user.username
 
-    return render_template('lists.html', page_title='My Lists', lists=lists)
+    return render_template('lists.html', page_title='My Lists', lists=lists, username=username)
 
 #Displaying todos page for the list title clicked
 @app.route('/display')
@@ -176,7 +207,9 @@ def show_list():
     if list_obj.id in my_list_ids:
         tasks = Task.query.filter_by(list_id=list_id).all()
         title = list_obj.title
-        return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id)
+        username=session['username']
+        admins = list_obj.admins
+        return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id, username=username, admins=admins)
     else: 
         return "Something went wrong"
 
@@ -197,8 +230,10 @@ def complete():
     tasks = Task.query.filter_by(list_id=list_id).all()
     list_obj = List.query.filter_by(id=list_id).first()
     title = list_obj.title
+    username = session['username']
+    admins = list_obj.admins
 
-    return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id)
+    return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id, username=username, admins=admins)
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
