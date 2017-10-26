@@ -146,6 +146,10 @@ def add_task():
     task_owner = request.form['list-id']
     list_obj = List.query.filter_by(id=task_owner).first()
     title = list_obj.title
+
+    if task_item == "":
+        flash("Your task is empty", "error")
+        return redirect("/display?list_id={0}".format(task_owner))
     new_task = Task(task_item, task_owner)
     db.session.add(new_task)
     db.session.commit()
