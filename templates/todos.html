@@ -18,18 +18,24 @@
 
     <ul>
         {% for task in tasks %}
-        <li>
-            {{task.item}}
+        <li class="btn" style="display:block; width:380px; text-align:left;">
             <form method="POST" action="/complete-task" style="display:inline-block;">
                 <input type="hidden" name="task-id" value="{{task.id}}" />
-                <input type="submit" value="{{task.completed}}" />
+            {% if task.completed == False %}
+                {% set value = url_for('static', filename='pictures/unchecked.png') %}
+            {% else %}
+                {% set value = url_for('static', filename='pictures/checked.png') %}
+            {% endif %}
+            <input type="image" src={{value}} alt="Submit" style="width:25px;" />
             </form>
-            
+            {{task.item}}
+
         </li>
         {% endfor %}
     </ul>
 
 {% endif %}
+
 
 <hr />
 
