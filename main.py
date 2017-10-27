@@ -4,15 +4,12 @@ from flask import Flask, request, redirect, render_template, url_for, flash, ses
 from flask_sqlalchemy import SQLAlchemy 
 import cgi
 
-
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://elimez:unitfour@localhost:8889/elimez')
 app.config['SQLALCHEMY_ECHO'] = True
-
 db = SQLAlchemy(app)
 app.secret_key = 'MakeAWish'
-
 
 #Create many to many relationship between List and a User
 users_lists = db.Table('users_lists',
@@ -81,7 +78,6 @@ def register():
             new_user = User(username, password_hash)
             db.session.add(new_user)
             db.session.commit()
-
             session['username'] = username
 
             return redirect('/lists')
@@ -104,7 +100,6 @@ def login():
             return redirect("/lists")
         else:
             flash('User password incorrect, or user does not exist', 'error')
-
             return render_template("login.html", page_title = "Login")
 
     return render_template('login.html', page_title="Login")
@@ -129,14 +124,12 @@ def title():
         new_list = List(title)
         db.session.add(new_list)
         db.session.commit()
-
         new_list.admins.append(owner)
         db.session.commit()
+        task_owner = new_list.id
 
-        session['title'] = title
-        admins = new_list.admins
-        return render_template('todos.html', page_title=title, list_id=new_list.id, username=username, admins=admins)
-
+        return redirect("/display?list_id={0}".format(task_owner))
+        
     return render_template('title.html', page_title="Create List", username=username)
 
 #Adding tasks on a newly created list only
@@ -145,7 +138,6 @@ def add_task():
     task_item = request.form['task']
     task_owner = request.form['list-id']
     list_obj = List.query.filter_by(id=task_owner).first()
-    title = list_obj.title
 
     if task_item == "":
         flash("Your task is empty", "error")
@@ -153,37 +145,27 @@ def add_task():
     new_task = Task(task_item, task_owner)
     db.session.add(new_task)
     db.session.commit()
-    tasks = Task.query.filter_by(list_id=task_owner).all()
-    username=session['username']
-    admins = list_obj.admins
-    
-    return render_template('todos.html', page_title=title, tasks=tasks, list_id=task_owner, username=username, admins=admins)
 
+    return redirect("/display?list_id={0}".format(task_owner))
+    
 #Add user the the list handler
 @app.route("/add-user", methods=['POST'])
 def add_user():
     task_owner = request.form['list-id']
     list_obj = List.query.filter_by(id=task_owner).first()
-    title = list_obj.title
-    tasks = Task.query.filter_by(list_id=task_owner).all()
-    username=session['username']
-
     get_username = request.form['user']
     user = User.query.filter_by(username=get_username).first()
 
     if user and user not in list_obj.admins:
         list_obj.admins.append(user)
         db.session.commit()
-        admins = list_obj.admins
-        return render_template('todos.html', page_title=title, tasks=tasks, list_id=task_owner, username=username, admins=admins)
+        return redirect("/display?list_id={0}".format(task_owner))
     else:
         if user in list_obj.admins:
             flash('User already added', 'error')
         else:
             flash('User does not exist', 'error')
-        admins = list_obj.admins
-        return render_template('todos.html', page_title=title, tasks=tasks, list_id=task_owner, username=username, admins=admins)
-
+        return redirect("/display?list_id={0}".format(task_owner))
 
 #Displaying all the list for the given user
 @app.route('/lists')
@@ -229,16 +211,10 @@ def complete():
     else: task.completed = False
     db.session.add(task)
     db.session.commit()
+    task_owner = task.list_id
 
-    list_id = task.list_id
-    tasks = Task.query.filter_by(list_id=list_id).all()
-    list_obj = List.query.filter_by(id=list_id).first()
-    title = list_obj.title
-    username = session['username']
-    admins = list_obj.admins
-
-    return render_template('todos.html', page_title=title, tasks=tasks, list_id=list_id, username=username, admins=admins)
-
+    return redirect("/display?list_id={0}".format(task_owner))
+   
 @app.route('/', methods=['POST', 'GET'])
 def index():
     return render_template('index.html', page_title="Elimez")
