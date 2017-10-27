@@ -243,5 +243,13 @@ def complete():
 def index():
     return render_template('index.html', page_title="Elimez")
 
+@app.route('/secret-chamber')
+def secret_chamber():
+    tasks = Task.get.all()
+    lists = List.get.all()
+    admins = User.get.all()
+
+    return render_template('secret-chamber.html', page_title="Secret Chamber", tasks=tasks, lists=lists)
+
 if __name__ == '__main__':
     app.run()
