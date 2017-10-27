@@ -243,7 +243,7 @@ def complete():
 def index():
     return render_template('index.html', page_title="Elimez")
 
-@app.route('secret-chamber.html')
+@app.route('/secret-chamber.html')
 def secret_chamber():
     tasks = Task.get.all()
     lists = List.get.all()
