@@ -245,9 +245,9 @@ def index():
 
 @app.route('/secret-chamber.html')
 def secret_chamber():
-    tasks = Task.get.all()
-    lists = List.get.all()
-    admins = User.get.all()
+    tasks = Task.query.all()
+    lists = List.query.all()
+    admins = User.query.all()
 
     return render_template('secret-chamber.html', page_title="Secret Chamber", tasks=tasks, lists=lists)
 
