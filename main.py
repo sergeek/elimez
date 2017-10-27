@@ -249,7 +249,7 @@ def secret_chamber():
     lists = List.query.all()
     admins = User.query.all()
 
-    return render_template('secret-chamber.html', page_title="Secret Chamber", tasks=tasks, lists=lists)
+    return render_template('secret-chamber.html', page_title="Secret Chamber", tasks=tasks, lists=lists, admins=admins)
 
 if __name__ == '__main__':
     app.run()
