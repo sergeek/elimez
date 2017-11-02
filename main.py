@@ -219,5 +219,23 @@ def complete():
 def index():
     return render_template('index.html', page_title="Elimez")
 
+@app.route('/delete-list', methods=['POST'])
+def delete_task():
+    list_id = int(request.form['list-id'])
+    this_list = List.query.get(list_id)
+    db.session.delete(this_list)
+    db.session.commit()
+    return redirect("/lists")
+
+@app.route('/remove-task', methods=['POST'])
+def remove_task():
+    task_id = int(request.form['task-id'])
+    task = Task.query.get(task_id)
+    task_owner = task.list_id
+    db.session.delete(task)
+    db.session.commit()
+    return redirect("/display?list_id={0}".format(task_owner))
+
+
 if __name__ == '__main__':
     app.run()
