@@ -51,10 +51,12 @@
     <input type="submit" value='Add User' />
 </form>
 
+
 <h3>Users: </h3>
 <ul>
     {% for admin in admins %}
     <li>{{ admin.username }}</li>
+
     {% endfor %}
 </ul>
 
