@@ -29,7 +29,7 @@
             <input type="image" src={{value}} alt="Submit" style="width:25px;" />
             </form>
             {{task.item}}
-              <form method='POST' action='/remove-task' style='display:inline-block;'>
+              <form method='POST' action='/remove-task' style='float:right;'>
                 
                 <input type='hidden' name='task-id' value='{{task.id}}'></input>
                 <input type='submit' value='Delete'/>

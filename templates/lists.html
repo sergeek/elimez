@@ -9,10 +9,10 @@
         {% for list in lists %}
         <table>
         <th><li class="list-title"><a href="/display?list_id={{list.id}}">{{list.title}}</a></li></th>
-        <th><form method='POST' action='/delete-list' style='display:inline-block;'>
+        <th><form method='POST' action='/delete-list' >
                 
                 <th><input type='hidden' name='list-id' value='{{list.id}}'></input>
-                <input style='float:right' type='submit' value='Delete'/>
+                <input style="position: absolute; right: 0; margin-right:200px;" type='submit' value='Delete'/>
                 </form></th>
         </table>
         {% endfor %}
